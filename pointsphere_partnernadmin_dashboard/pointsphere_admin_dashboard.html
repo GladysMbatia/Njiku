@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PointSphere – Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --tc:#C4622D;--tc-l:#E8845A;--tc-d:#8B3D18;
+  --gold:#D4A017;--gold-l:#F0C040;
+  --cream:#FAF6EF;
+  --muted:#8B7B6A;
+  --sky:#1A6B9A;--sky-l:#2A9DD4;
+  --green:#2D6A1F;--green-l:#4A9A30;--green-bright:#7ECC4A;
+  --red-l:#D94040;
+  --purple:#5B3FA0;--purple-l:#8B6FD4;
+  --bg:#0A0C14;--card:#111420;--card2:#171B2A;
+  --border:rgba(138,111,212,0.16);
+  --border2:rgba(138,111,212,0.28);
+  --accent:#8B6FD4;--accent-l:#B09EE8;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh;overflow-x:hidden}
+
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:1.5rem 1.25rem 1.25rem;border-bottom:1px solid var(--border)}
+.logo-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--tc));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:#fff;flex-shrink:0}
+.logo-txt{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--cream)}
+.logo-txt span{color:var(--accent-l)}
+
+.sb-admin{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.admin-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.admin-name{font-size:13px;font-weight:600;color:var(--cream)}
+.admin-role{font-size:10px;color:var(--accent-l);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+.sb-nav{flex:1;padding:.75rem 0}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:.5rem 1.25rem .3rem;opacity:.55}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.6rem 1.25rem;cursor:pointer;transition:background .18s;border-left:3px solid transparent;font-size:13px;color:rgba(250,246,239,.55)}
+.nav-item:hover{background:rgba(138,111,212,.08);color:var(--cream)}
+.nav-item.active{background:rgba(138,111,212,.14);border-left-color:var(--accent-l);color:var(--cream);font-weight:500}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:rgba(196,98,45,.8);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+
+.sb-sys{margin:1rem 1.25rem;background:rgba(138,111,212,.08);border:1px solid var(--border2);border-radius:12px;padding:.85rem 1rem}
+.sys-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem}
+.sys-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.sys-row:last-child{margin-bottom:0}
+.sys-key{font-size:11px;color:var(--muted)}
+.sys-val{font-size:11px;font-weight:500}
+.sv-green{color:var(--green-bright)}
+.sv-amber{color:var(--gold-l)}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:1px solid var(--border);background:var(--bg)}
+.topbar-left{}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--cream)}
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-btn{height:34px;border-radius:8px;border:1px solid var(--border2);background:rgba(138,111,212,.08);padding:0 14px;font-size:12px;font-weight:500;color:var(--accent-l);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;transition:background .18s}
+.tb-btn:hover{background:rgba(138,111,212,.16)}
+.tb-btn.danger{background:rgba(196,98,45,.12);border-color:rgba(196,98,45,.3);color:var(--tc-l)}
+.tb-btn.danger:hover{background:rgba(196,98,45,.2)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--purple));border-color:transparent;color:#fff;box-shadow:0 2px 12px rgba(138,111,212,.3)}
+.tb-btn.primary:hover{box-shadow:0 4px 18px rgba(138,111,212,.45)}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:rgba(138,111,212,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--tc-l);position:absolute;top:6px;right:6px;border:1.5px solid var(--bg)}
+
+.content{padding:1.75rem 2rem}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.5rem}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.kpi-card:hover{border-color:var(--border2)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0}
+.kc-purple::before{background:linear-gradient(90deg,var(--accent),var(--accent-l))}
+.kc-green::before{background:linear-gradient(90deg,var(--green-l),var(--green-bright))}
+.kc-orange::before{background:linear-gradient(90deg,var(--tc),var(--tc-l))}
+.kc-gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-l))}
+.kc-blue::before{background:linear-gradient(90deg,var(--sky),var(--sky-l))}
+.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.35rem}
+.kpi-val{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--cream);line-height:1}
+.kpi-change{font-size:11px;margin-top:.35rem;font-weight:500}
+.kc-up{color:var(--green-bright)}
+.kc-down{color:var(--tc-l)}
+.kc-neutral{color:var(--gold-l)}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.sc-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border)}
+.sc-title{font-size:14px;font-weight:600;color:var(--cream)}
+.sc-right{display:flex;align-items:center;gap:8px}
+.sc-link{font-size:12px;color:var(--accent-l);cursor:pointer;opacity:.8}
+.sc-link:hover{opacity:1}
+.sc-tabs{display:flex;gap:4px}
+.sc-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--muted);transition:all .18s;font-weight:500}
+.sc-tab.active{background:rgba(138,111,212,.18);color:var(--accent-l)}
+
+/* SYSTEM CHART */
+.chart-wrap{padding:1.25rem 1.4rem}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:150px;margin-bottom:.5rem}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:5px 5px 0 0;transition:opacity .2s;cursor:pointer;min-height:4px}
+.bar:hover{opacity:.75}
+.bar-earn{background:linear-gradient(180deg,var(--green-bright),var(--green-l))}
+.bar-redeem{background:linear-gradient(180deg,var(--tc-l),var(--tc))}
+.bar-float{background:linear-gradient(180deg,var(--accent-l),var(--accent))}
+.bar-label{font-size:10px;color:var(--muted)}
+.chart-legend{display:flex;gap:14px;padding:0 1.4rem .9rem;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.ld-earn{background:var(--green-bright)}
+.ld-redeem{background:var(--tc-l)}
+.ld-float{background:var(--accent-l)}
+
+/* ALERTS PANEL */
+.alert-list{padding:.5rem 0}
+.alert-item{display:flex;align-items:flex-start;gap:11px;padding:.8rem 1.4rem;border-bottom:1px solid rgba(138,111,212,.06);cursor:pointer;transition:background .15s}
+.alert-item:last-child{border-bottom:none}
+.alert-item:hover{background:rgba(138,111,212,.04)}
+.alert-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ai-warn{background:rgba(196,98,45,.2)}
+.ai-info{background:rgba(138,111,212,.2)}
+.ai-success{background:rgba(74,154,48,.2)}
+.ai-gold{background:rgba(212,160,23,.18)}
+.alert-content{flex:1;min-width:0}
+.alert-title{font-size:12px;font-weight:600;color:var(--cream);line-height:1.4}
+.alert-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
+.alert-time{font-size:10px;color:var(--muted);white-space:nowrap;margin-left:8px;margin-top:2px}
+
+/* PARTNERS TABLE */
+.partners-table{width:100%;border-collapse:collapse}
+.partners-table th{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:.65rem 1.4rem;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.partners-table td{font-size:12px;color:var(--cream);padding:.75rem 1.4rem;border-bottom:1px solid rgba(138,111,212,.05)}
+.partners-table tr:hover td{background:rgba(138,111,212,.04)}
+.partners-table tr:last-child td{border-bottom:none}
+.p-logo{width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;vertical-align:middle;margin-right:8px}
+.pl-shell{background:rgba(255,204,0,.15);color:#FFCC00}
+.pl-java{background:rgba(196,98,45,.2);color:var(--tc-l)}
+.pl-nestle{background:rgba(26,107,154,.2);color:var(--sky-l)}
+.pl-unilever{background:rgba(74,154,48,.2);color:var(--green-bright)}
+.pl-safaricom{background:rgba(138,111,212,.2);color:var(--accent-l)}
+.status-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 9px;border-radius:100px}
+.sp-active{background:rgba(74,154,48,.15);color:var(--green-bright)}
+.sp-warn{background:rgba(212,160,23,.15);color:var(--gold-l)}
+.sp-low{background:rgba(196,98,45,.15);color:var(--tc-l)}
+.float-bar-bg{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;width:80px;display:inline-block;vertical-align:middle}
+.float-bar-fill{height:100%;border-radius:2px}
+
+/* BOTTOM ROW */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+
+/* POINT RULES */
+.rules-list{padding:.75rem 1.4rem}
+.rule-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .7rem;background:var(--card2);border:1px solid var(--border);border-radius:9px;margin-bottom:.45rem;cursor:pointer;transition:border-color .18s}
+.rule-row:hover{border-color:var(--border2)}
+.rule-row:last-child{margin-bottom:0}
+.rule-partner{font-size:12px;font-weight:500;color:var(--cream)}
+.rule-type{font-size:10px;color:var(--muted);margin-top:2px}
+.rule-pts{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--accent-l)}
+.toggle{width:32px;height:18px;border-radius:9px;background:rgba(74,154,48,.4);position:relative;cursor:pointer;flex-shrink:0;margin-left:10px;border:none;transition:background .2s}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.off{background:rgba(255,255,255,.12)}
+.toggle.off::after{right:16px}
+
+/* FLOAT STATUS */
+.float-status-list{padding:.75rem 1.4rem}
+.fs-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--card2);border:1px solid var(--border);border-radius:9px;margin-bottom:.45rem}
+.fs-item:last-child{margin-bottom:0}
+.fs-left{display:flex;align-items:center;gap:8px}
+.fs-name{font-size:12px;font-weight:500;color:var(--cream)}
+.fs-amount{font-family:'Playfair Display',serif;font-size:13px;font-weight:700}
+.fa-green{color:var(--green-bright)}
+.fa-amber{color:var(--gold-l)}
+.fa-red{color:var(--tc-l)}
+.fs-track{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;width:60px;margin-top:3px}
+.fs-fill{height:100%;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="logo-mark">P</div>
+      <div class="logo-txt">Point<span>Sphere</span></div>
+    </div>
+
+    <div class="sb-admin">
+      <div class="admin-avatar">KM</div>
+      <div>
+        <div class="admin-name">Gladys Mbatia</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-section">System</div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+        Overview
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5 5 0 015 5v2.5l1.5 2H1.5L3 9V6.5a5 5 0 015-5z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Alerts
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-section">Partners</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12V5l6-3 6 3v7l-6 1-6-1z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Partners
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4V3a1.5 1.5 0 013 0v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Float Accounts
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Invoices
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-section">Customers</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5.5" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="5.5" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 13c0-2.21 2.01-4 4.5-4M8 11c.5-.38 1.2-.6 2-.6 2 0 3.5 1.4 3.5 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Customers
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Transactions
+      </div>
+      <div class="nav-section">Config</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5H13l-2.8 2.2 1 3.8L8 9.5l-3.2 2 1-3.8L3 5.5h3.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Point Rules
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        System Settings
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12V5l6-3 6 3v7M6 16v-4h4v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Reports
+      </div>
+    </nav>
+
+    <div class="sb-sys">
+      <div class="sys-title">System Health</div>
+      <div class="sys-row">
+        <span class="sys-key">API Status</span>
+        <span class="sys-val sv-green">Operational</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-key">POS Integration</span>
+        <span class="sys-val sv-green">Online</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-key">M-Pesa Gateway</span>
+        <span class="sys-val sv-amber">Degraded</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-key">Float Engine</span>
+        <span class="sys-val sv-green">Running</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">Admin Console</div>
+        <div class="topbar-sub">Saturday, April 11, 2026 · Last sync 2 mins ago</div>
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M4 6l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export
+        </button>
+        <button class="tb-btn danger">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6v3M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          System Alert
+        </button>
+        <button class="tb-btn primary" onclick="this.textContent='Adding...';setTimeout(()=>this.textContent='+ Register Partner',1500)">+ Register Partner</button>
+        <div class="notif-btn">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5 5 0 015 5v2.5l1.5 2H1.5L3 9V6.5a5 5 0 015-5z" stroke="#8B6FD4" stroke-width="1.4"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#8B6FD4" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-card kc-purple">
+          <div class="kpi-label">Total Customers</div>
+          <div class="kpi-val">41,280</div>
+          <div class="kpi-change kc-up">+1,240 this month</div>
+        </div>
+        <div class="kpi-card kc-green">
+          <div class="kpi-label">Points in Circulation</div>
+          <div class="kpi-val">8.4M</div>
+          <div class="kpi-change kc-up">+340K this week</div>
+        </div>
+        <div class="kpi-card kc-orange">
+          <div class="kpi-label">Overdraft Liabilities</div>
+          <div class="kpi-val">KSh 18,200</div>
+          <div class="kpi-change kc-down">3 open cases</div>
+        </div>
+        <div class="kpi-card kc-gold">
+          <div class="kpi-label">Total Float Held</div>
+          <div class="kpi-val">KSh 1.2M</div>
+          <div class="kpi-change kc-neutral">Across 18 partners</div>
+        </div>
+        <div class="kpi-card kc-blue">
+          <div class="kpi-label">Active Partners</div>
+          <div class="kpi-val">18</div>
+          <div class="kpi-change kc-up">+2 this month</div>
+        </div>
+      </div>
+
+      <!-- MAIN GRID: CHART + ALERTS -->
+      <div class="main-grid">
+
+        <!-- SYSTEM-WIDE CHART -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">System Activity</span>
+            <div class="sc-right">
+              <div class="sc-tabs">
+                <span class="sc-tab active" onclick="adminTab(this,'week')">Week</span>
+                <span class="sc-tab" onclick="adminTab(this,'month')">Month</span>
+              </div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-bars" id="adminChartBars"></div>
+          </div>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot ld-earn"></div>Points Earned</div>
+            <div class="leg-item"><div class="leg-dot ld-redeem"></div>Points Redeemed</div>
+            <div class="leg-item"><div class="leg-dot ld-float"></div>Float Used</div>
+          </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">System Alerts</span>
+            <span class="sc-link">Mark all read</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item">
+              <div class="alert-icon ai-warn">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2z" stroke="#E8845A" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6v3M8 11v.5" stroke="#E8845A" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Shell overdraft — invoice generated</div>
+                <div class="alert-desc">KSh 4,200 cross-partner liability recorded. Invoice sent to Java House &amp; Naivas.</div>
+              </div>
+              <div class="alert-time">2m ago</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon ai-warn">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="9" rx="1.5" stroke="#E8845A" stroke-width="1.4"/><path d="M4.5 4V3a1.5 1.5 0 013 0v1" stroke="#E8845A" stroke-width="1.4" stroke-linecap="round"/><path d="M8 8v2M8 11v.3" stroke="#E8845A" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Java House float below threshold</div>
+                <div class="alert-desc">Balance at KSh 12,400 — below the KSh 15,000 minimum requirement.</div>
+              </div>
+              <div class="alert-time">18m ago</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon ai-gold">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#F0C040" stroke-width="1.4"/><path d="M8 5v3.5l2 1.5" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">M-Pesa gateway latency detected</div>
+                <div class="alert-desc">Average response 4.2s — above normal. STK push delays may occur.</div>
+              </div>
+              <div class="alert-time">1h ago</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-icon ai-success">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#7ECC4A" stroke-width="1.4"/><path d="M5 8l2 2 4-4" stroke="#7ECC4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Nestle float deposit confirmed</div>
+                <div class="alert-desc">KSh 100,000 deposit processed and credited to float account.</div>
+              </div>
+              <div class="alert-time">3h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTNERS TABLE -->
+      <div class="section-card" style="margin-bottom:1.25rem">
+        <div class="sc-head">
+          <span class="sc-title">Partner Registry</span>
+          <div class="sc-right">
+            <span class="sc-link">+ Register Partner</span>
+          </div>
+        </div>
+        <table class="partners-table">
+          <thead>
+            <tr>
+              <th>Partner</th>
+              <th>Float Balance</th>
+              <th>Float Health</th>
+              <th>Points Issued</th>
+              <th>Overdraft</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="p-logo pl-shell" style="display:inline-flex">SH</div>Shell Kenya</td>
+              <td style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-bright)">KSh 100,500</td>
+              <td>
+                <div class="float-bar-bg"><div class="float-bar-fill" style="width:85%;background:var(--green-bright)"></div></div>
+              </td>
+              <td style="color:var(--cream)">48,250 pts</td>
+              <td style="color:var(--tc-l);font-weight:500">KSh 4,200</td>
+              <td><span class="status-pill sp-active">Active</span></td>
+            </tr>
+            <tr>
+              <td><div class="p-logo pl-java" style="display:inline-flex">JH</div>Java House</td>
+              <td style="font-family:'Playfair Display',serif;font-weight:700;color:var(--gold-l)">KSh 12,400</td>
+              <td>
+                <div class="float-bar-bg"><div class="float-bar-fill" style="width:18%;background:var(--tc-l)"></div></div>
+              </td>
+              <td style="color:var(--cream)">21,800 pts</td>
+              <td style="color:var(--muted)">—</td>
+              <td><span class="status-pill sp-warn">Low Float</span></td>
+            </tr>
+            <tr>
+              <td><div class="p-logo pl-nestle" style="display:inline-flex">NV</div>Nestle</td>
+              <td style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-bright)">KSh 50,000</td>
+              <td>
+                <div class="float-bar-bg"><div class="float-bar-fill" style="width:92%;background:var(--green-bright)"></div></div>
+              </td>
+              <td style="color:var(--cream)">62,100 pts</td>
+              <td style="color:var(--muted)">—</td>
+              <td><span class="status-pill sp-active">Active</span></td>
+            </tr>
+            <tr>
+              <td><div class="p-logo pl-unilever" style="display:inline-flex">UL</div>Unilever Kenya</td>
+              <td style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-bright)">KSh 95,000</td>
+              <td>
+                <div class="float-bar-bg"><div class="float-bar-fill" style="width:60%;background:var(--gold-l)"></div></div>
+              </td>
+              <td style="color:var(--cream)">33,450 pts</td>
+              <td style="color:var(--muted)">—</td>
+              <td><span class="status-pill sp-active">Active</span></td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+
+        <!-- POINT RULES -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Global Point Rules</span>
+            <span class="sc-link">+ Add Rule</span>
+          </div>
+          <div class="rules-list">
+            <div class="rule-row">
+              <div>
+                <div class="rule-partner">Shell — Fuel</div>
+                <div class="rule-type">Per KSh 100</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="rule-pts">5 pts</div>
+                <button class="toggle" onclick="this.classList.toggle('off')"></button>
+              </div>
+            </div>
+            <div class="rule-row">
+              <div>
+                <div class="rule-partner">Java House — Food</div>
+                <div class="rule-type">Per KSh 100</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="rule-pts">8 pts</div>
+                <button class="toggle" onclick="this.classList.toggle('off')"></button>
+              </div>
+            </div>
+            <div class="rule-row">
+              <div>
+                <div class="rule-partner">Nestle — Grocery</div>
+                <div class="rule-type">Per KSh 100</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="rule-pts">3 pts</div>
+                <button class="toggle" onclick="this.classList.toggle('off')"></button>
+              </div>
+            </div>
+            <div class="rule-row">
+              <div>
+                <div class="rule-partner">Weekend Promo</div>
+                <div class="rule-type">All partners · Sat–Sun</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="rule-pts">2× mult</div>
+                <button class="toggle" onclick="this.classList.toggle('off')"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLOAT STATUS -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Float Health</span>
+            <span class="sc-link">View all</span>
+          </div>
+          <div class="float-status-list">
+            <div class="fs-item">
+              <div class="fs-left">
+                <div class="p-logo pl-shell" style="display:inline-flex;width:24px;height:24px;border-radius:6px;font-size:8px">SH</div>
+                <div>
+                  <div class="fs-name">Shell</div>
+                  <div class="fs-track"><div class="fs-fill" style="width:85%;background:var(--green-bright)"></div></div>
+                </div>
+              </div>
+              <div class="fs-amount fa-green">KSh 284K</div>
+            </div>
+            <div class="fs-item">
+              <div class="fs-left">
+                <div class="p-logo pl-naivas" style="display:inline-flex;width:24px;height:24px;border-radius:6px;font-size:8px">NV</div>
+                <div>
+                  <div class="fs-name">Nestle</div>
+                  <div class="fs-track"><div class="fs-fill" style="width:92%;background:var(--green-bright)"></div></div>
+                </div>
+              </div>
+              <div class="fs-amount fa-green">KSh 40K</div>
+            </div>
+            <div class="fs-item">
+              <div class="fs-left">
+                <div class="p-logo pl-unilever" style="display:inline-flex;width:24px;height:24px;border-radius:6px;font-size:8px">UL</div>
+                <div>
+                  <div class="fs-name">Unilever</div>
+                  <div class="fs-track"><div class="fs-fill" style="width:60%;background:var(--gold-l)"></div></div>
+                </div>
+              </div>
+              <div class="fs-amount fa-amber">KSh 55K</div>
+            </div>
+            <div class="fs-item">
+              <div class="fs-left">
+                <div class="p-logo pl-java" style="display:inline-flex;width:24px;height:24px;border-radius:6px;font-size:8px">JH</div>
+                <div>
+                  <div class="fs-name">Java House</div>
+                  <div class="fs-track"><div class="fs-fill" style="width:18%;background:var(--tc-l)"></div></div>
+                </div>
+              </div>
+              <div class="fs-amount fa-red">KSh 12K</div>
+            </div>
+
+
+        <!-- QUICK CONFIG -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Quick Config</span>
+          </div>
+          <div style="padding:1rem 1.4rem;display:flex;flex-direction:column;gap:.75rem">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.35rem">Min Float Threshold</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--accent-l)">KSh 15,000</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">Per partner minimum</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.35rem">Point Exchange Rate</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--gold-l)">1 pt = KSh 1</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">Redemption value</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.35rem">Overdraft Grace Period</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--tc-l)">7 days</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">Before invoice escalation</div>
+            </div>
+            <button style="width:100%;background:linear-gradient(135deg,var(--accent),var(--purple));border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;transition:opacity .18s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'" onclick="this.textContent='Saved!';setTimeout(()=>this.textContent='Save Configuration',1500)">Save Configuration</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const weekD = [
+  {label:'Mon',earn:920,redeem:310,float:480},
+  {label:'Tue',earn:750,redeem:280,float:390},
+  {label:'Wed',earn:1100,redeem:420,float:610},
+  {label:'Thu',earn:880,redeem:350,float:520},
+  {label:'Fri',earn:1350,redeem:510,float:720},
+  {label:'Sat',earn:1580,redeem:620,float:890},
+  {label:'Sun',earn:1020,redeem:390,float:560},
+];
+const monthD = [
+  {label:'W1',earn:5400,redeem:1800,float:2800},
+  {label:'W2',earn:6200,redeem:2100,float:3400},
+  {label:'W3',earn:5800,redeem:1950,float:3100},
+  {label:'W4',earn:7400,redeem:2600,float:4200},
+];
+
+function renderAdminBars(data){
+  const max = Math.max(...data.map(d=>Math.max(d.earn,d.redeem,d.float)));
+  const container = document.getElementById('adminChartBars');
+  container.innerHTML = '';
+  data.forEach(d=>{
+    const col = document.createElement('div');
+    col.className='bar-col';
+    const eH = Math.round((d.earn/max)*130);
+    const rH = Math.round((d.redeem/max)*130);
+    const fH = Math.round((d.float/max)*130);
+    col.innerHTML=`
+      <div style="display:flex;align-items:flex-end;gap:2px;height:130px">
+        <div class="bar bar-earn" style="height:${eH}px;flex:1" title="Earned: ${d.earn}"></div>
+        <div class="bar bar-redeem" style="height:${rH}px;flex:1" title="Redeemed: ${d.redeem}"></div>
+        <div class="bar bar-float" style="height:${fH}px;flex:1" title="Float: ${d.float}"></div>
+      </div>
+      <div class="bar-label">${d.label}</div>
+    `;
+    container.appendChild(col);
+  });
+}
+
+function adminTab(el, period){
+  document.querySelectorAll('.sc-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderAdminBars(period==='week' ? weekD : monthD);
+}
+
+renderAdminBars(weekD);
+</script>
+</body>
+</html>

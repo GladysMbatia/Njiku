@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PointSphere – Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --terracotta: #C4622D;
+    --terracotta-light: #E8845A;
+    --terracotta-dark: #8B3D18;
+    --gold: #D4A017;
+    --gold-light: #F0C040;
+    --gold-dark: #9A7210;
+    --ochre: #E07B39;
+    --cream: #FAF6EF;
+    --deep-brown: #2C1A0E;
+    --mid-brown: #5C3D2E;
+    --forest: #2D5016;
+    --forest-light: #4A7C28;
+    --text-muted: #8B6B5A;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep-brown);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .pattern-bg {
+    position: fixed;
+    inset: 0;
+    background-color: var(--deep-brown);
+    background-image:
+      repeating-linear-gradient(45deg, rgba(212,160,23,0.04) 0px, rgba(212,160,23,0.04) 1px, transparent 1px, transparent 20px),
+      repeating-linear-gradient(-45deg, rgba(196,98,45,0.04) 0px, rgba(196,98,45,0.04) 1px, transparent 1px, transparent 20px);
+    z-index: 0;
+  }
+
+  .adinkra-corner {
+    position: fixed;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .adinkra-corner.top-left { top: -40px; left: -40px; }
+  .adinkra-corner.bottom-right { bottom: -40px; right: -40px; transform: rotate(180deg); }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  .hero-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,98,45,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeSlideDown 0.6s ease both;
+  }
+
+  .logo-mark {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--terracotta), var(--gold));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 900;
+    color: var(--white);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+  }
+
+  .logo-text span { color: var(--gold-light); }
+
+  .hero-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 0;
+    animation: fadeSlideUp 0.7s 0.2s ease both;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(212,160,23,0.15);
+    border: 1px solid rgba(212,160,23,0.3);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    width: fit-content;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    animation: pulse 2s infinite;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-headline .accent {
+    color: var(--terracotta-light);
+    display: block;
+  }
+
+  .hero-subtext {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 380px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .partners-row { margin-bottom: 2.5rem; }
+
+  .partners-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .partner-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .partner-chip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(250,246,239,0.7);
+    letter-spacing: 0.02em;
+  }
+
+  .stats-strip {
+    display: flex;
+    gap: 2rem;
+    animation: fadeSlideUp 0.7s 0.4s ease both;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .login-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2.5rem;
+    position: relative;
+  }
+
+  .login-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(250,246,239,0.03);
+    border-left: 1px solid rgba(212,160,23,0.12);
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    animation: fadeSlideUp 0.7s 0.1s ease both;
+  }
+
+  .login-card-header { margin-bottom: 2rem; }
+
+  .login-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.02em;
+  }
+
+  .login-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .role-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.75rem;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .role-tab {
+    padding: 9px 6px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  .role-tab.active {
+    background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+    color: var(--white);
+    box-shadow: 0 2px 12px rgba(196,98,45,0.4);
+  }
+
+  .role-tab:hover:not(.active) {
+    color: var(--cream);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .form-group { margin-bottom: 1.1rem; }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .input-wrap { position: relative; }
+
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .form-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(212,160,23,0.18);
+    border-radius: 10px;
+    padding: 13px 14px 13px 54px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--cream);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .form-input::placeholder { color: rgba(139,107,90,0.6); }
+
+  .form-input:focus {
+    border-color: rgba(212,160,23,0.5);
+    background: rgba(255,255,255,0.07);
+  }
+
+  .form-input.no-prefix { padding-left: 14px; }
+
+  .role-fields { display: none; }
+  .role-fields.active { display: block; }
+
+  .pin-wrap { display: flex; gap: 8px; }
+
+  .pin-input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(212,160,23,0.18);
+    border-radius: 10px;
+    padding: 13px 6px;
+    font-size: 20px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--gold-light);
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    width: 48px;
+    letter-spacing: 0.1em;
+  }
+
+  .pin-input:focus {
+    border-color: rgba(212,160,23,0.5);
+    background: rgba(255,255,255,0.07);
+  }
+
+  .form-help-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.25rem;
+    margin-top: -0.25rem;
+  }
+
+  .form-link {
+    font-size: 12px;
+    color: var(--gold);
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    text-decoration: none;
+  }
+
+  .form-link:hover { opacity: 1; }
+
+  .btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, var(--terracotta), var(--ochre));
+    border: none;
+    border-radius: 12px;
+    padding: 15px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--white);
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(196,98,45,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-login::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(196,98,45,0.5);
+  }
+
+  .btn-login:active { transform: translateY(0px); }
+
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1.2rem 0;
+  }
+
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .or-divider span {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .mpesa-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(45,80,22,0.2);
+    border: 1px solid rgba(74,124,40,0.25);
+    border-radius: 10px;
+    padding: 11px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .mpesa-badge:hover { background: rgba(45,80,22,0.3); }
+
+  .mpesa-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #4A7C28, #2D5016);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #7ECC4A;
+    flex-shrink: 0;
+  }
+
+  .mpesa-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #7ECC4A;
+  }
+
+  .register-nudge {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .register-nudge a {
+    color: var(--gold-light);
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    margin-left: 4px;
+  }
+
+  .register-nudge a:hover { color: var(--gold); }
+
+  .footer-note {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: rgba(139,107,90,0.45);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    z-index: 2;
+  }
+
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 900px) {
+    .page-wrapper { grid-template-columns: 1fr; }
+    .hero-panel { padding: 2rem 1.5rem 1.5rem; }
+    .hero-headline { font-size: 2.2rem; }
+    .login-panel { padding: 2rem 1.5rem 4rem; }
+    .footer-note { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pattern-bg"></div>
+
+<svg class="adinkra-corner top-left" width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="120" cy="120" r="100" stroke="#D4A017" stroke-width="1.5" fill="none"/>
+  <circle cx="120" cy="120" r="70" stroke="#D4A017" stroke-width="1" fill="none"/>
+  <circle cx="120" cy="120" r="40" stroke="#D4A017" stroke-width="1" fill="none"/>
+  <line x1="20" y1="120" x2="220" y2="120" stroke="#D4A017" stroke-width="1"/>
+  <line x1="120" y1="20" x2="120" y2="220" stroke="#D4A017" stroke-width="1"/>
+  <line x1="49" y1="49" x2="191" y2="191" stroke="#D4A017" stroke-width="0.75"/>
+  <line x1="191" y1="49" x2="49" y2="191" stroke="#D4A017" stroke-width="0.75"/>
+  <rect x="100" y="100" width="40" height="40" transform="rotate(45 120 120)" stroke="#C4622D" stroke-width="1" fill="none"/>
+  <rect x="85" y="85" width="70" height="70" transform="rotate(45 120 120)" stroke="#C4622D" stroke-width="0.75" fill="none"/>
+</svg>
+
+<svg class="adinkra-corner bottom-right" width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="120" cy="120" r="100" stroke="#D4A017" stroke-width="1.5" fill="none"/>
+  <circle cx="120" cy="120" r="70" stroke="#D4A017" stroke-width="1" fill="none"/>
+  <circle cx="120" cy="120" r="40" stroke="#D4A017" stroke-width="1" fill="none"/>
+  <line x1="20" y1="120" x2="220" y2="120" stroke="#D4A017" stroke-width="1"/>
+  <line x1="120" y1="20" x2="120" y2="220" stroke="#D4A017" stroke-width="1"/>
+  <line x1="49" y1="49" x2="191" y2="191" stroke="#D4A017" stroke-width="0.75"/>
+  <line x1="191" y1="49" x2="49" y2="191" stroke="#D4A017" stroke-width="0.75"/>
+  <rect x="100" y="100" width="40" height="40" transform="rotate(45 120 120)" stroke="#C4622D" stroke-width="1" fill="none"/>
+  <rect x="85" y="85" width="70" height="70" transform="rotate(45 120 120)" stroke="#C4622D" stroke-width="0.75" fill="none"/>
+</svg>
+
+<div class="page-wrapper">
+
+  <!-- LEFT: HERO -->
+  <div class="hero-panel">
+    <div class="logo-wrap">
+      <div class="logo-mark">P</div>
+      <div class="logo-text">Point<span>Sphere</span></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">Unified Loyalty Network</div>
+
+      <h1 class="hero-headline">
+        One Card.
+        <span class="accent">Every Partner.</span>
+        All Rewards.
+      </h1>
+
+      <p class="hero-subtext">
+        Earn points at your local supermarket. Redeem them at the fuel station.
+        PointSphere connects Kenya's top brands into one seamless loyalty ecosystem.
+      </p>
+
+      <div class="partners-row">
+        <p class="partners-label">Partner Network</p>
+        <div class="partner-chips">
+          <span class="partner-chip">Shell</span>
+          <span class="partner-chip">Java House</span>
+          <span class="partner-chip">Unilever</span>
+          <span class="partner-chip">Nestle</span>
+          <span class="partner-chip">+ more</span>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-item">
+          <div class="stat-num">10K+</div>
+          <div class="stat-label">Active Members</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">18</div>
+          <div class="stat-label">Partner Brands</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">KSh 1M</div>
+          <div class="stat-label">Points Redeemed</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:6px; opacity:0.25;">
+      <div style="height:3px; width:40px; background:var(--terracotta); border-radius:2px;"></div>
+      <div style="height:3px; width:16px; background:var(--gold); border-radius:2px;"></div>
+      <div style="height:3px; width:8px; background:var(--ochre); border-radius:2px;"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: LOGIN -->
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="login-card-header">
+        <h2 class="login-title">Welcome back</h2>
+        <p class="login-subtitle">Sign in to your PointSphere account</p>
+      </div>
+
+      <div class="role-tabs" id="roleTabs">
+        <div class="role-tab active" data-role="customer" onclick="switchRole('customer')">Customer</div>
+        <div class="role-tab" data-role="partner" onclick="switchRole('partner')">Partner</div>
+        <div class="role-tab" data-role="admin" onclick="switchRole('admin')">Admin</div>
+      </div>
+
+      <!-- Customer Fields -->
+      <div class="role-fields active" id="fields-customer">
+        <div class="form-group">
+          <label class="form-label">M-Pesa Phone Number</label>
+          <div class="input-wrap">
+            <span class="input-prefix">+254</span>
+            <input class="form-input" type="tel" placeholder="7XX XXX XXX" maxlength="9" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">4-Digit PIN</label>
+          <div class="pin-wrap">
+            <input class="pin-input" type="password" maxlength="1" id="p1" oninput="pinMove(this,'p2')" onkeydown="pinBack(event,this,null)">
+            <input class="pin-input" type="password" maxlength="1" id="p2" oninput="pinMove(this,'p3')" onkeydown="pinBack(event,this,'p1')">
+            <input class="pin-input" type="password" maxlength="1" id="p3" oninput="pinMove(this,'p4')" onkeydown="pinBack(event,this,'p2')">
+            <input class="pin-input" type="password" maxlength="1" id="p4" oninput="pinMove(this,null)" onkeydown="pinBack(event,this,'p3')">
+          </div>
+        </div>
+        <div class="form-help-row">
+          <a class="form-link" href="#">Forgot PIN?</a>
+        </div>
+      </div>
+
+      <!-- Partner Fields -->
+      <div class="role-fields" id="fields-partner">
+        <div class="form-group">
+          <label class="form-label">Partner ID / Email</label>
+          <input class="form-input no-prefix" type="email" placeholder="partner@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input no-prefix" type="password" placeholder="••••••••">
+        </div>
+        <div class="form-help-row">
+          <a class="form-link" href="#">Forgot password?</a>
+        </div>
+      </div>
+
+      <!-- Admin Fields -->
+      <div class="role-fields" id="fields-admin">
+        <div class="form-group">
+          <label class="form-label">Admin Username</label>
+          <input class="form-input no-prefix" type="text" placeholder="admin@pointsphere.co.ke">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input no-prefix" type="password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">2FA Code</label>
+          <input class="form-input no-prefix" type="text" placeholder="6-digit code" maxlength="6" style="letter-spacing:0.2em;">
+        </div>
+        <div class="form-help-row">
+          <a class="form-link" href="#">Need help?</a>
+        </div>
+      </div>
+
+      <button class="btn-login" onclick="handleLogin()" id="loginBtn">Sign In</button>
+
+      <div class="or-divider" id="mpesaDivider">
+        <span>or continue with</span>
+      </div>
+
+      <div class="mpesa-badge" id="mpesaBtn">
+        <div class="mpesa-icon">M</div>
+        <span class="mpesa-text">Sign in with M-Pesa STK Push</span>
+      </div>
+
+      <p class="register-nudge" id="registerNudge">
+        New to PointSphere?
+        <a href="#">Create an account</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">© 2026 PointSphere · Unified Loyalty System Across Kenya</div>
+
+<script>
+  function switchRole(role) {
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('[data-role="' + role + '"]').classList.add('active');
+    document.querySelectorAll('.role-fields').forEach(f => f.classList.remove('active'));
+    document.getElementById('fields-' + role).classList.add('active');
+
+    const mpesaDivider = document.getElementById('mpesaDivider');
+    const mpesaBtn = document.getElementById('mpesaBtn');
+    const registerNudge = document.getElementById('registerNudge');
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (role === 'customer') {
+      mpesaDivider.style.display = '';
+      mpesaBtn.style.display = '';
+      registerNudge.style.display = '';
+      loginBtn.textContent = 'Sign In';
+    } else if (role === 'partner') {
+      mpesaDivider.style.display = 'none';
+      mpesaBtn.style.display = 'none';
+      registerNudge.innerHTML = 'Want to join the network? <a href="#">Apply as Partner</a>';
+      registerNudge.style.display = '';
+      loginBtn.textContent = 'Access Partner Portal';
+    } else {
+      mpesaDivider.style.display = 'none';
+      mpesaBtn.style.display = 'none';
+      registerNudge.style.display = 'none';
+      loginBtn.textContent = 'Access Admin Console';
+    }
+  }
+
+  function pinMove(el, nextId) {
+    if (el.value && nextId) {
+      document.getElementById(nextId).focus();
+    }
+  }
+
+  function pinBack(e, el, prevId) {
+    if (e.key === 'Backspace' && !el.value && prevId) {
+      document.getElementById(prevId).focus();
+    }
+  }
+
+  function handleLogin() {
+    const btn = document.getElementById('loginBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Signing in...';
+    btn.style.opacity = '0.7';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.opacity = '1';
+    }, 1800);
+  }
+</script>
+
+</body>
+</html>

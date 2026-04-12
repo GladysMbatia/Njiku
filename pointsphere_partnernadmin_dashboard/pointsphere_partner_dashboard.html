@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PointSphere – Partner Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --tc:#C4622D;--tc-l:#E8845A;--tc-d:#8B3D18;
+  --gold:#D4A017;--gold-l:#F0C040;--gold-d:#9A7210;
+  --ochre:#E07B39;
+  --cream:#FAF6EF;
+  --muted:#8B6B5A;
+  --sky:#1A6B9A;--sky-l:#2A9DD4;
+  --green:#2D6A1F;--green-l:#4A9A30;
+  --red:#8B2020;--red-l:#D94040;
+  --bg:#0F1A12;--card:#162010;--card2:#1C2A15;
+  --border:rgba(74,154,48,0.18);
+  --border2:rgba(74,154,48,0.32);
+  --accent:#4A9A30;--accent-l:#7ECC4A;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh;overflow-x:hidden}
+
+/* SHELL */
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:1.5rem 1.25rem 1.25rem;border-bottom:1px solid var(--border)}
+.logo-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:#fff;flex-shrink:0}
+.logo-txt{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--cream)}
+.logo-txt span{color:var(--accent-l)}
+
+.sb-partner{padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.partner-badge{display:flex;align-items:center;gap:10px;background:rgba(74,154,48,.1);border:1px solid var(--border2);border-radius:12px;padding:.75rem 1rem}
+.partner-avatar{width:40px;height:40px;border-radius:9px;background:linear-gradient(135deg,#FFCC00,rgba(255,204,0,.5));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7A5E00;flex-shrink:0;letter-spacing:.02em}
+.partner-name{font-size:13px;font-weight:600;color:var(--cream);line-height:1.3}
+.partner-id{font-size:10px;color:var(--muted);margin-top:2px}
+.partner-status{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:10px;color:var(--accent-l);font-weight:500}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--accent-l);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+.sb-nav{flex:1;padding:.75rem 0}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:.5rem 1.25rem .3rem;opacity:.55}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.6rem 1.25rem;cursor:pointer;transition:background .18s;border-left:3px solid transparent;font-size:13px;color:rgba(250,246,239,.6)}
+.nav-item:hover{background:rgba(74,154,48,.08);color:var(--cream)}
+.nav-item.active{background:rgba(74,154,48,.14);border-left-color:var(--accent-l);color:var(--cream);font-weight:500}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+
+.sb-float{margin:1rem 1.25rem;background:linear-gradient(135deg,rgba(74,154,48,.18),rgba(74,154,48,.07));border:1px solid var(--border2);border-radius:13px;padding:1rem}
+.float-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.35rem}
+.float-amount{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent-l);line-height:1}
+.float-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.deposit-btn{width:100%;margin-top:.75rem;background:linear-gradient(135deg,var(--accent),var(--green));border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 3px 12px rgba(74,154,48,.3)}
+.deposit-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(74,154,48,.45)}
+
+.sb-bottom{padding:1rem 1.25rem;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer}
+.sb-bottom:hover{color:var(--cream)}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:1px solid var(--border);background:var(--bg)}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--cream)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-btn{height:34px;border-radius:8px;border:1px solid var(--border2);background:rgba(74,154,48,.08);padding:0 14px;font-size:12px;font-weight:500;color:var(--accent-l);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .18s}
+.tb-btn:hover{background:rgba(74,154,48,.16)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--green));border-color:transparent;color:#fff;box-shadow:0 2px 10px rgba(74,154,48,.3)}
+.tb-btn.primary:hover{box-shadow:0 4px 16px rgba(74,154,48,.45)}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:rgba(74,154,48,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--tc-l);position:absolute;top:6px;right:6px;border:1.5px solid var(--bg)}
+
+.content{padding:1.75rem 2rem}
+
+/* FLOAT HERO */
+.float-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.fh-card{border-radius:16px;padding:1.5rem;border:1px solid;position:relative;overflow:hidden}
+.fh-main{background:linear-gradient(135deg,rgba(74,154,48,.22),rgba(74,154,48,.06));border-color:var(--border2)}
+.fh-warn{background:linear-gradient(135deg,rgba(196,98,45,.2),rgba(196,98,45,.06));border-color:rgba(196,98,45,.28)}
+.fh-info{background:linear-gradient(135deg,rgba(26,107,154,.2),rgba(26,107,154,.06));border-color:rgba(26,107,154,.28)}
+.fh-card::before{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;border-radius:50%;opacity:.06}
+.fh-main::before{background:var(--accent-l)}
+.fh-warn::before{background:var(--tc-l)}
+.fh-info::before{background:var(--sky-l)}
+.fh-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:.9rem}
+.fhi-green{background:rgba(74,154,48,.28)}
+.fhi-orange{background:rgba(196,98,45,.25)}
+.fhi-blue{background:rgba(26,107,154,.25)}
+.fh-label{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.3rem}
+.fh-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--cream);line-height:1}
+.fh-sub{font-size:12px;margin-top:.4rem;font-weight:500}
+.fhs-green{color:var(--accent-l)}
+.fhs-orange{color:var(--tc-l)}
+.fhs-blue{color:var(--sky-l)}
+
+/* CHART + INVOICES ROW */
+.mid-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.sc-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border)}
+.sc-title{font-size:14px;font-weight:600;color:var(--cream)}
+.sc-link{font-size:12px;color:var(--accent-l);cursor:pointer;opacity:.8}
+.sc-link:hover{opacity:1}
+.sc-tabs{display:flex;gap:4px}
+.sc-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--muted);transition:all .18s;font-weight:500}
+.sc-tab.active{background:rgba(74,154,48,.18);color:var(--accent-l)}
+.sc-tab:hover:not(.active){color:var(--cream)}
+
+/* BAR CHART */
+.chart-wrap{padding:1.25rem 1.4rem}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:140px;margin-bottom:.6rem}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:5px 5px 0 0;transition:opacity .2s;cursor:pointer;min-height:4px}
+.bar:hover{opacity:.8}
+.bar-earn{background:linear-gradient(180deg,var(--accent-l),var(--accent))}
+.bar-redeem{background:linear-gradient(180deg,var(--tc-l),var(--tc))}
+.bar-label{font-size:10px;color:var(--muted);margin-top:2px}
+.chart-legend{display:flex;gap:16px;padding:0 1.4rem .9rem}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.leg-earn{background:var(--accent-l)}
+.leg-redeem{background:var(--tc-l)}
+
+/* INVOICES */
+.invoice-list{padding:.5rem 0}
+.inv-item{display:flex;align-items:center;gap:12px;padding:.75rem 1.4rem;transition:background .15s;cursor:pointer;border-bottom:1px solid rgba(74,154,48,.06)}
+.inv-item:last-child{border-bottom:none}
+.inv-item:hover{background:rgba(74,154,48,.04)}
+.inv-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700}
+.inv-paid{background:rgba(74,154,48,.2);color:var(--accent-l)}
+.inv-due{background:rgba(212,160,23,.18);color:var(--gold-l)}
+.inv-overdue{background:rgba(196,98,45,.2);color:var(--tc-l)}
+.inv-info{flex:1;min-width:0}
+.inv-name{font-size:12px;font-weight:500;color:var(--cream)}
+.inv-date{font-size:10px;color:var(--muted);margin-top:2px}
+.inv-amount{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;white-space:nowrap}
+.inv-status{font-size:10px;font-weight:500;margin-top:2px;text-align:right}
+.s-paid{color:var(--accent-l)}
+.s-due{color:var(--gold-l)}
+.s-overdue{color:var(--tc-l)}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+
+/* TRANSACTIONS TABLE */
+.tx-table{width:100%;border-collapse:collapse}
+.tx-table th{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:.6rem 1.4rem;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.tx-table td{font-size:12px;color:var(--cream);padding:.7rem 1.4rem;border-bottom:1px solid rgba(74,154,48,.05)}
+.tx-table tr:hover td{background:rgba(74,154,48,.04)}
+.tx-table tr:last-child td{border-bottom:none}
+.td-pts-earn{color:var(--accent-l);font-weight:600;font-family:'Playfair Display',serif}
+.td-pts-redeem{color:var(--tc-l);font-weight:600;font-family:'Playfair Display',serif}
+.td-phone{color:var(--muted);font-size:11px}
+.td-time{color:var(--muted);font-size:11px}
+
+/* EARNING RULES */
+.rules-list{padding:.75rem 1.4rem}
+.rule-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:.5rem;cursor:pointer;transition:border-color .18s}
+.rule-item:hover{border-color:var(--border2)}
+.rule-item:last-child{margin-bottom:0}
+.rule-left{display:flex;align-items:center;gap:10px}
+.rule-cat{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rc-fuel{background:rgba(255,204,0,.15);color:#FFCC00}
+.rc-food{background:rgba(196,98,45,.2);color:var(--tc-l)}
+.rc-grocery{background:rgba(26,107,154,.2);color:var(--sky-l)}
+.rc-product{background:rgba(74,154,48,.2);color:var(--accent-l)}
+.rule-name{font-size:13px;font-weight:500;color:var(--cream)}
+.rule-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.rule-rate{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--accent-l)}
+.rule-rate span{font-size:10px;font-weight:400;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:2px}
+.edit-rule-btn{font-size:11px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;transition:all .18s;margin-left:8px}
+.edit-rule-btn:hover{border-color:var(--border2);color:var(--accent-l)}
+
+/* OVERDRAFT ALERT */
+.overdraft-alert{background:linear-gradient(135deg,rgba(196,98,45,.18),rgba(139,45,45,.12));border:1px solid rgba(196,98,45,.35);border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:12px}
+.oa-icon{width:36px;height:36px;border-radius:9px;background:rgba(196,98,45,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.oa-title{font-size:13px;font-weight:600;color:var(--tc-l);margin-bottom:3px}
+.oa-text{font-size:12px;color:var(--muted);line-height:1.5}
+.oa-action{display:inline-block;margin-top:.5rem;font-size:11px;color:var(--gold-l);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .float-hero{grid-template-columns:1fr 1fr}
+  .mid-grid,.bottom-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="logo-mark">P</div>
+      <div class="logo-txt">Point<span>Sphere</span></div>
+    </div>
+
+    <div class="sb-partner">
+      <div class="partner-badge">
+        <div class="partner-avatar">SH</div>
+        <div>
+          <div class="partner-name">Shell Kenya Ltd.</div>
+          <div class="partner-id">Partner ID: PSP-0042</div>
+          <div class="partner-status">
+            <span class="status-dot"></span>Active
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-section">Dashboard</div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+        Overview
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Invoices
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Transactions
+      </div>
+      <div class="nav-section">Management</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1.5v13M3 6l5-4.5L13 6M4 8h8M4 11h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Float Account
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8.5l1.5 1.5 2.5-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Earning Rules
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12V5l6-3 6 3v7M6 16v-4h4v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Reports
+      </div>
+      <div class="nav-section">Account</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 13.5c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Profile
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Settings
+      </div>
+    </nav>
+
+    <div class="sb-float">
+      <div class="float-label">Float Balance</div>
+      <div class="float-amount">KSh 100,500</div>
+      <div class="float-sub">Updated just now</div>
+      <button class="deposit-btn" onclick="this.textContent='Processing...';setTimeout(()=>this.textContent='+ Deposit Float',1500)">+ Deposit Float</button>
+    </div>
+
+    <div class="sb-bottom">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 12L2 8l4-4M2 8h10M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sign Out
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">Partner Dashboard</div>
+      <div class="topbar-right">
+        <button class="tb-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M4 6l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export Report
+        </button>
+        <button class="tb-btn primary" onclick="this.textContent='Loading...';setTimeout(()=>this.textContent='+ Deposit Float',1500)">+ Deposit Float</button>
+        <div class="notif-btn">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5 5 0 015 5v2.5l1.5 2H1.5L3 9V6.5a5 5 0 015-5z" stroke="#4A9A30" stroke-width="1.4"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#4A9A30" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERDRAFT ALERT -->
+      <div class="overdraft-alert">
+        <div class="oa-icon">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2z" stroke="#E8845A" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6v4M8 11.5v.5" stroke="#E8845A" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="oa-title">Overdraft Liability Notice</div>
+          <div class="oa-text">Your float was used to cover 3 cross-partner redemptions totalling <strong style="color:var(--tc-l)">KSh 4,200</strong>. An invoice has been generated against Java House and Naivas Supermarket for the outstanding amount.</div>
+          <span class="oa-action">View Invoice Details →</span>
+        </div>
+      </div>
+
+      <!-- FLOAT HERO CARDS -->
+      <div class="float-hero">
+        <div class="fh-card fh-main">
+          <div class="fh-icon fhi-green">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="9" rx="1.5" stroke="#7ECC4A" stroke-width="1.4"/><path d="M4.5 4V3a1.5 1.5 0 013 0v1M4 9h2M8 9h4" stroke="#7ECC4A" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="fh-label">Current Float Balance</div>
+          <div class="fh-val">KSh 100,500</div>
+          <div class="fh-sub fhs-green">+KSh 50,000 deposited this week</div>
+        </div>
+        <div class="fh-card fh-warn">
+          <div class="fh-icon fhi-orange">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2z" stroke="#E8845A" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6v3M8 11v.5" stroke="#E8845A" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="fh-label">Overdraft Liability</div>
+          <div class="fh-val">KSh 4,200</div>
+          <div class="fh-sub fhs-orange">3 cross-partner redemptions pending</div>
+        </div>
+        <div class="fh-card fh-info">
+          <div class="fh-icon fhi-blue">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M2 12V5l6-3 6 3v7l-6 1-6-1z" stroke="#2A9DD4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="fh-label">Points Issued (Month)</div>
+          <div class="fh-val">48,250 pts</div>
+          <div class="fh-sub fhs-blue">≈ KSh 48,250 in customer value</div>
+        </div>
+      </div>
+
+      <!-- MID GRID: CHART + INVOICES -->
+      <div class="mid-grid">
+
+        <!-- ACTIVITY CHART -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Points Activity</span>
+            <div class="sc-tabs">
+              <span class="sc-tab active" onclick="setTab(this,'week')">Week</span>
+              <span class="sc-tab" onclick="setTab(this,'month')">Month</span>
+              <span class="sc-tab" onclick="setTab(this,'year')">Year</span>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-bars" id="chartBars"></div>
+          </div>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot leg-earn"></div>Points Earned</div>
+            <div class="leg-item"><div class="leg-dot leg-redeem"></div>Points Redeemed</div>
+          </div>
+        </div>
+
+        <!-- INVOICES -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Recent Invoices</span>
+            <span class="sc-link">View all</span>
+          </div>
+          <div class="invoice-list">
+            <div class="inv-item">
+              <div class="inv-icon inv-overdue">!</div>
+              <div class="inv-info">
+                <div class="inv-name">Cross-Redemption — Java House</div>
+                <div class="inv-date">Generated Today</div>
+              </div>
+              <div style="text-align:right">
+                <div class="inv-amount" style="color:var(--tc-l)">KSh 2,800</div>
+                <div class="inv-status s-overdue">Action needed</div>
+              </div>
+            </div>
+            <div class="inv-item">
+              <div class="inv-icon inv-overdue">!</div>
+              <div class="inv-info">
+                <div class="inv-name">Cross-Redemption — Nestle</div>
+                <div class="inv-date">Generated Today</div>
+              </div>
+              <div style="text-align:right">
+                <div class="inv-amount" style="color:var(--tc-l)">KSh 1,400</div>
+                <div class="inv-status s-overdue">Action needed</div>
+              </div>
+            </div>
+            <div class="inv-item">
+              <div class="inv-icon inv-due" style="font-size:10px">DUE</div>
+              <div class="inv-info">
+                <div class="inv-name">Monthly Float Statement</div>
+                <div class="inv-date">Due Apr 30, 2026</div>
+              </div>
+              <div style="text-align:right">
+                <div class="inv-amount" style="color:var(--gold-l)">KSh 12,000</div>
+                <div class="inv-status s-due">Pending</div>
+              </div>
+            </div>
+            <div class="inv-item">
+              <div class="inv-icon inv-paid" style="font-size:12px">✓</div>
+              <div class="inv-info">
+                <div class="inv-name">Float Deposit — March 2026</div>
+                <div class="inv-date">Paid Mar 28, 2026</div>
+              </div>
+              <div style="text-align:right">
+                <div class="inv-amount" style="color:var(--accent-l)">KSh 50,000</div>
+                <div class="inv-status s-paid">Paid</div>
+              </div>
+            </div>
+            <div class="inv-item">
+              <div class="inv-icon inv-paid" style="font-size:12px">✓</div>
+              <div class="inv-info">
+                <div class="inv-name">Points Settlement — Feb 2026</div>
+                <div class="inv-date">Paid Feb 28, 2026</div>
+              </div>
+              <div style="text-align:right">
+                <div class="inv-amount" style="color:var(--accent-l)">KSh 38,500</div>
+                <div class="inv-status s-paid">Paid</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM GRID: TRANSACTIONS + EARNING RULES -->
+      <div class="bottom-grid">
+
+        <!-- RECENT TRANSACTIONS -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Customer Transactions</span>
+            <span class="sc-link">View all</span>
+          </div>
+          <table class="tx-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Points</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="font-size:12px;color:var(--cream);font-weight:500">+254 712 345 678</div>
+                  <div class="td-phone">Fuel — KSh 5,000</div>
+                </td>
+                <td><span style="font-size:11px;background:rgba(74,154,48,.15);color:var(--accent-l);padding:3px 8px;border-radius:4px;font-weight:500">Earn</span></td>
+                <td class="td-pts-earn">+250</td>
+                <td class="td-time">08:42 AM</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-size:12px;color:var(--cream);font-weight:500">+254 798 654 321</div>
+                  <div class="td-phone">Fuel — KSh 3,200</div>
+                </td>
+                <td><span style="font-size:11px;background:rgba(74,154,48,.15);color:var(--accent-l);padding:3px 8px;border-radius:4px;font-weight:500">Earn</span></td>
+                <td class="td-pts-earn">+160</td>
+                <td class="td-time">09:15 AM</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-size:12px;color:var(--cream);font-weight:500">+254 733 112 233</div>
+                  <div class="td-phone">Points Redemption</div>
+                </td>
+                <td><span style="font-size:11px;background:rgba(196,98,45,.15);color:var(--tc-l);padding:3px 8px;border-radius:4px;font-weight:500">Redeem</span></td>
+                <td class="td-pts-redeem">−500</td>
+                <td class="td-time">10:03 AM</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-size:12px;color:var(--cream);font-weight:500">+254 711 987 654</div>
+                  <div class="td-phone">Fuel — KSh 8,000</div>
+                </td>
+                <td><span style="font-size:11px;background:rgba(74,154,48,.15);color:var(--accent-l);padding:3px 8px;border-radius:4px;font-weight:500">Earn</span></td>
+                <td class="td-pts-earn">+400</td>
+                <td class="td-time">11:29 AM</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-size:12px;color:var(--cream);font-weight:500">+254 722 445 566</div>
+                  <div class="td-phone">Cross-Partner Redeem</div>
+                </td>
+                <td><span style="font-size:11px;background:rgba(212,160,23,.15);color:var(--gold-l);padding:3px 8px;border-radius:4px;font-weight:500">X-Redeem</span></td>
+                <td class="td-pts-redeem">−280</td>
+                <td class="td-time">12:48 PM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EARNING RULES -->
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Earning Rules</span>
+            <span class="sc-link" onclick="alert('Edit rules coming soon!')">+ Add Rule</span>
+          </div>
+          <div class="rules-list">
+            <div class="rule-item">
+              <div class="rule-left">
+                <div class="rule-cat rc-fuel">⛽</div>
+                <div>
+                  <div class="rule-name">Fuel Purchase</div>
+                  <div class="rule-desc">Per KSh 100 spent on fuel</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center">
+                <div>
+                  <div class="rule-rate">5 pts<span>/ KSh 100</span></div>
+                </div>
+                <button class="edit-rule-btn">Edit</button>
+              </div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-left">
+                <div class="rule-cat rc-food" style="font-size:13px">🛒</div>
+                <div>
+                  <div class="rule-name">Shop Purchases</div>
+                  <div class="rule-desc">Convenience store items</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center">
+                <div>
+                  <div class="rule-rate">1 pts<span>/ KSh 100</span></div>
+                </div>
+                <button class="edit-rule-btn">Edit</button>
+              </div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-left">
+                <div class="rule-cat rc-grocery" style="font-size:13px">⚡</div>
+                <div>
+                  <div class="rule-name">EV Charging</div>
+                  <div class="rule-desc">Electric vehicle charge-ups</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center">
+                <div>
+                  <div class="rule-rate">1 pts<span>/ KSh 100</span></div>
+                </div>
+                <button class="edit-rule-btn">Edit</button>
+              </div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-left">
+                <div class="rule-cat rc-product" style="font-size:13px">🎁</div>
+                <div>
+                  <div class="rule-name">Weekend Promo</div>
+                  <div class="rule-desc">Sat–Sun double points</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center">
+                <div>
+                  <div class="rule-rate">2x<span>multiplier</span></div>
+                </div>
+                <button class="edit-rule-btn">Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const weekData = [
+  {label:'Mon',earn:68,redeem:22},
+  {label:'Tue',earn:45,redeem:18},
+  {label:'Wed',earn:82,redeem:35},
+  {label:'Thu',earn:55,redeem:28},
+  {label:'Fri',earn:95,redeem:42},
+  {label:'Sat',earn:110,redeem:55},
+  {label:'Sun',earn:74,redeem:30},
+];
+const monthData = [
+  {label:'W1',earn:320,redeem:95},
+  {label:'W2',earn:410,redeem:140},
+  {label:'W3',earn:380,redeem:120},
+  {label:'W4',earn:530,redeem:175},
+];
+const yearData = [
+  {label:'Jan',earn:1200,redeem:380},
+  {label:'Feb',earn:980,redeem:310},
+  {label:'Mar',earn:1450,redeem:490},
+  {label:'Apr',earn:870,redeem:220},
+  {label:'May',earn:1100,redeem:360},
+  {label:'Jun',earn:1350,redeem:420},
+];
+
+let currentData = weekData;
+
+function renderBars(data){
+  const max = Math.max(...data.map(d=>Math.max(d.earn,d.redeem)));
+  const container = document.getElementById('chartBars');
+  container.innerHTML = '';
+  data.forEach(d=>{
+    const col = document.createElement('div');
+    col.className='bar-col';
+    const earnH = Math.round((d.earn/max)*120);
+    const redeemH = Math.round((d.redeem/max)*120);
+    col.innerHTML=`
+      <div style="display:flex;align-items:flex-end;gap:3px;height:120px">
+        <div class="bar bar-earn" style="height:${earnH}px;flex:1" title="Earned: ${d.earn}"></div>
+        <div class="bar bar-redeem" style="height:${redeemH}px;flex:1" title="Redeemed: ${d.redeem}"></div>
+      </div>
+      <div class="bar-label">${d.label}</div>
+    `;
+    container.appendChild(col);
+  });
+}
+
+function setTab(el, period){
+  document.querySelectorAll('.sc-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(period==='week') renderBars(weekData);
+  else if(period==='month') renderBars(monthData);
+  else renderBars(yearData);
+}
+
+renderBars(weekData);
+</script>
+</body>
+</html>
