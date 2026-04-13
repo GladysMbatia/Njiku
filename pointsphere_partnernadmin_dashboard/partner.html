@@ -1,3 +1,8 @@
+<script>
+if(localStorage.getItem("role") !== "partner"){
+  window.location.href = "index.html";
+}
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -609,3 +614,11 @@ renderBars(weekData);
 </script>
 </body>
 </html>
+<button onclick="logout()">Logout</button>
+
+<script>
+function logout(){
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+</script>

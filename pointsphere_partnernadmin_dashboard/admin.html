@@ -1,3 +1,8 @@
+<script>
+if(localStorage.getItem("role") !== "admin"){
+  window.location.href = "index.html";
+}
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -644,3 +649,11 @@ renderAdminBars(weekD);
 </script>
 </body>
 </html>
+<button onclick="logout()">Logout</button>
+
+<script>
+function logout(){
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+</script>

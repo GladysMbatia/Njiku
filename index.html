@@ -1035,3 +1035,38 @@
 
 </body>
 </html>
+<select id="role">
+  <option value="customer">Customer</option>
+  <option value="partner">Partner</option>
+  <option value="admin">Admin</option>
+</select>
+
+<button onclick="login()">Login</button>
+
+<script>
+function login(){
+  let role = document.getElementById("role").value;
+
+  // Save role in browser
+  localStorage.setItem("role", role);
+
+  // Redirect
+  if(role === "customer"){
+    window.location.href = "customer.html";
+  }
+  else if(role === "partner"){
+    window.location.href = "partner.html";
+  }
+  else{
+    window.location.href = "admin.html";
+  }
+}
+</script>
+<button onclick="logout()">Logout</button>
+
+<script>
+function logout(){
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+</script>
