@@ -1020,17 +1020,23 @@
    * In production this would submit the form data to the backend.
    * The button text changes based on whether we're signing in or registering.
    */
-  function handleLogin() {
-    const btn    = document.getElementById('loginBtn');
-    const orig   = btn.textContent;
-    const loading = customerMode === 'register' ? 'Creating account...' : 'Signing in...';
-    btn.textContent  = loading;
-    btn.style.opacity = '0.7';
-    setTimeout(() => {
-      btn.textContent  = orig;
-      btn.style.opacity = '1';
-    }, 1800);
-  }
+ function handleLogin() {
+  const btn = document.getElementById('loginBtn');
+  const activeRole = document.querySelector('.role-tab.active').dataset.role;
+  
+  btn.textContent = 'Signing in...';
+  btn.style.opacity = '0.7';
+
+  setTimeout(() => {
+    if (activeRole === 'customer') {
+      window.location.href = 'pointsphere_customer_dashboard.html';
+    } else if (activeRole === 'partner') {
+      window.location.href = 'pointsphere_partner_dashboard.html';
+    } else {
+      window.location.href = 'pointsphere_admin_dashboard.html';
+    }
+  }, 1500);
+}
 </script>
 
 </body>
